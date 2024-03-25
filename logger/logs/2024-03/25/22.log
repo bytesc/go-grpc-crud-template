@@ -1,0 +1,2 @@
+{"level":"info","ts":1711377436.1805875,"msg":"/api/crud_rpc/list/","status":200,"method":"GET","path":"/api/crud_rpc/list/","query":"pageSize=10&pageNum=1&name=tjh","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.37.0","errors":"","cost":0.0066055}
+{"level":"info","ts":1711377445.1513138,"msg":"/api/crud_rpc/list/","status":200,"method":"GET","path":"/api/crud_rpc/list/","query":"name=eee","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.37.0","errors":"","cost":0.0038695}

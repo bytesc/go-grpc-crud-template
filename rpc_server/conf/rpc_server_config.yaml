@@ -1,5 +1,5 @@
 server:
-  Name: curd_rpc
+  Name: crud_rpc
   Listen: "0.0.0.0:8080"
   Addr: "127.0.0.1:8080"
 

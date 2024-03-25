@@ -9,7 +9,6 @@ import (
 	"go_crud/rpc_server/crud_pb"
 	"go_crud/rpc_server/service"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
 	"log"
 	"net"
 	"time"
@@ -47,7 +46,7 @@ func main() {
 	crud_pb.RegisterCRUDServiceServer(s, &server)
 	fmt.Println("grpc server running :" + viper.GetString("server.Listen"))
 
-	etcd()
+	go etcd()
 
 	// 开始处理客户端请求。
 	err = s.Serve(listen)
@@ -81,7 +80,7 @@ func etcd() {
 	if err != nil {
 		log.Fatalf("Error putting service to etcd: %v", err)
 	}
-	grpclog.Info(putResp, serviceName, serviceAddr)
+	log.Println(putResp, serviceName, serviceAddr)
 
 	// 保持心跳，以续约租约
 	keepAliveChan, err := cli.KeepAlive(context.Background(), leaseResp.ID)
@@ -96,6 +95,7 @@ func etcd() {
 				log.Fatalf("Lease expired or KeepAlive channel closed")
 				return
 			}
+			//fmt.Println(ka.String())
 		}
 	}
 }
