@@ -17,3 +17,5 @@ token:
   refreshDuration: 5  # 多久续签一次
   longDuration: 1440  # 长 token，多久必须重新登陆
 
+etcd:
+  Endpoint: 127.0.0.1:2379

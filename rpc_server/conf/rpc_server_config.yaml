@@ -1,6 +1,7 @@
 server:
-  Addr: 0.0.0.0
-  Port: 8080
+  Name: curd_rpc
+  Listen: "0.0.0.0:8080"
+  Addr: "127.0.0.1:8080"
 
 db:
   DriverName: mysql
@@ -10,3 +11,6 @@ db:
   Password: 123456
   Host: 127.0.0.1 #host.docker.internal #
   Charset: utf8mb4
+
+etcd:
+  Endpoint: "127.0.0.1:2379"
