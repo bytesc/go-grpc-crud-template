@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package crud;
+
+// 指定生成Go代码的选项
+option go_package = "./crud_pb";
+
+// 定义CrudList消息，对应于您的CrudList结构体
+message CrudList {
+  int32 id = 1; // gorm.Model中的ID字段
+  string name = 2; // 名字
+  string level = 3; // 级别
+  string email = 4; // 邮箱
+  string phone = 5; // 电话
+  string birthday = 6; // 生日
+  string address = 7; // 地址
+}
+
+// 添加操作的请求和响应消息
+message AddRequest {
+  CrudList list = 1;
+}
+
+message AddResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+// 删除操作的请求和响应消息
+message DeleteRequest {
+  int32 id = 1;
+}
+
+message DeleteResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// 更新操作的请求和响应消息
+message UpdateRequest {
+  CrudList list = 1;
+}
+
+message UpdateResponse {
+  bool success = 1;
+  string message = 2;
+  CrudList list = 3;
+}
+
+// 查询操作的请求和响应消息
+message QueryRequest {
+  int32 id = 1;
+}
+
+message QueryResponse {
+  bool success = 1;
+  string message = 2;
+  CrudList list = 3;
+}
+
+// 分页查询操作的请求和响应消息
+message QueryPageRequest {
+  int32 page = 1;
+  int32 pageSize = 2;
+}
+
+message QueryPageResponse {
+  bool success = 1;
+  string message = 2;
+  repeated CrudList lists = 3;
+}
+
+// 定义CRUD服务
+service CRUDService {
+  // 添加记录
+  rpc Add (AddRequest) returns (AddResponse);
+
+  // 删除记录
+  rpc Delete (DeleteRequest) returns (DeleteResponse);
+
+  // 更新记录
+  rpc Update (UpdateRequest) returns (UpdateResponse);
+
+  // 查询记录
+  rpc Query (QueryRequest) returns (QueryResponse);
+}

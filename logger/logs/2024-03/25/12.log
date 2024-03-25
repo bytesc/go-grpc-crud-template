@@ -1,0 +1,2 @@
+{"level":"info","ts":1711340230.879749,"msg":"/api/crud_rpc/add","status":200,"method":"POST","path":"/api/crud_rpc/add","query":"","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.37.0","errors":"","cost":0.0002562}
+{"level":"info","ts":1711340425.2082086,"msg":"/api/crud_rpc/add","status":200,"method":"POST","path":"/api/crud_rpc/add","query":"","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.37.0","errors":"","cost":0.0048872}

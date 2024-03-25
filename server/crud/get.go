@@ -7,9 +7,9 @@ import (
 	"strconv"
 )
 
-func QueryGET(r *gin.RouterGroup, db *gorm.DB) {
+func QueryGET(r *gin.RouterGroup, DB *gorm.DB) {
 	r.GET("/list/:name", func(c *gin.Context) {
-		db = db.Session(&gorm.Session{NewDB: true})
+		db := DB.Session(&gorm.Session{NewDB: true})
 		name := c.Param("name")
 		var dataList []mysql_db.CrudList
 		db.Where("name = ?", name).Find(&dataList)

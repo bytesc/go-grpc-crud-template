@@ -11,6 +11,7 @@ import (
 	"go_crud/mysql_db"
 	"go_crud/server"
 	"go_crud/server/crud"
+	"go_crud/server/crud_rpc"
 	"go_crud/server/files"
 	"go_crud/server/midware"
 	"go_crud/server/user"
@@ -45,6 +46,7 @@ func main() {
 	utils.RefreshGET(Router)
 
 	userRouter := r.Group("api/user")
+	userRouter.Use(gin.Logger(), gin.Recovery())
 	user.LoginPost(userRouter, db)
 	user.SignUpPost(userRouter, db)
 	user.LogoutGet(userRouter, db)
@@ -58,6 +60,11 @@ func main() {
 	crud.UpdatePOST(crudRouter, db)
 	crud.QueryGET(crudRouter, db)
 	crud.QueryPageGET(crudRouter, db)
+
+	crudRpcRouter := r.Group("/api/crud_rpc")
+	//, midware.CheckLogin("crud_rpc", db)
+	crudRpcRouter.Use(gin.Logger(), gin.Recovery())
+	crud_rpc.AddPOST(crudRpcRouter)
 
 	filesRouter := r.Group("/api/files")
 	filesRouter.Use(gin.Logger(), gin.Recovery(), midware.CheckLogin("files", db))
