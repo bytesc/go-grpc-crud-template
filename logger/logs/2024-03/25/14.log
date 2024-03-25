@@ -1,0 +1,3 @@
+{"level":"info","ts":1711349387.5683677,"msg":"/api/crud_rpc/list/","status":200,"method":"GET","path":"/api/crud_rpc/list/","query":"pageSize=10&pageNum=2","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.37.0","errors":"","cost":0.0034702}
+{"level":"info","ts":1711349405.6404881,"msg":"/api/crud_rpc/list/","status":200,"method":"GET","path":"/api/crud_rpc/list/","query":"pageSize=10&pageNum=1","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.37.0","errors":"","cost":0.002394}
+{"level":"info","ts":1711349418.1389766,"msg":"/api/crud_rpc/list/","status":200,"method":"GET","path":"/api/crud_rpc/list/","query":"pageSize=10&pageNum=1&name=tjh","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.37.0","errors":"","cost":0.0042608}

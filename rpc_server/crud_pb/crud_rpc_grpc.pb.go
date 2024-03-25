@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	CRUDService_Add_FullMethodName    = "/crud.CRUDService/Add"
-	CRUDService_Delete_FullMethodName = "/crud.CRUDService/Delete"
-	CRUDService_Update_FullMethodName = "/crud.CRUDService/Update"
-	CRUDService_Query_FullMethodName  = "/crud.CRUDService/Query"
+	CRUDService_Add_FullMethodName       = "/crud.CRUDService/Add"
+	CRUDService_Delete_FullMethodName    = "/crud.CRUDService/Delete"
+	CRUDService_Update_FullMethodName    = "/crud.CRUDService/Update"
+	CRUDService_Query_FullMethodName     = "/crud.CRUDService/Query"
+	CRUDService_QueryPage_FullMethodName = "/crud.CRUDService/QueryPage"
 )
 
 // CRUDServiceClient is the client API for CRUDService service.
@@ -37,6 +38,7 @@ type CRUDServiceClient interface {
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
 	// 查询记录
 	Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (*QueryResponse, error)
+	QueryPage(ctx context.Context, in *QueryPageRequest, opts ...grpc.CallOption) (*QueryPageResponse, error)
 }
 
 type cRUDServiceClient struct {
@@ -83,6 +85,15 @@ func (c *cRUDServiceClient) Query(ctx context.Context, in *QueryRequest, opts ..
 	return out, nil
 }
 
+func (c *cRUDServiceClient) QueryPage(ctx context.Context, in *QueryPageRequest, opts ...grpc.CallOption) (*QueryPageResponse, error) {
+	out := new(QueryPageResponse)
+	err := c.cc.Invoke(ctx, CRUDService_QueryPage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CRUDServiceServer is the server API for CRUDService service.
 // All implementations must embed UnimplementedCRUDServiceServer
 // for forward compatibility
@@ -95,6 +106,7 @@ type CRUDServiceServer interface {
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
 	// 查询记录
 	Query(context.Context, *QueryRequest) (*QueryResponse, error)
+	QueryPage(context.Context, *QueryPageRequest) (*QueryPageResponse, error)
 	mustEmbedUnimplementedCRUDServiceServer()
 }
 
@@ -113,6 +125,9 @@ func (UnimplementedCRUDServiceServer) Update(context.Context, *UpdateRequest) (*
 }
 func (UnimplementedCRUDServiceServer) Query(context.Context, *QueryRequest) (*QueryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Query not implemented")
+}
+func (UnimplementedCRUDServiceServer) QueryPage(context.Context, *QueryPageRequest) (*QueryPageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryPage not implemented")
 }
 func (UnimplementedCRUDServiceServer) mustEmbedUnimplementedCRUDServiceServer() {}
 
@@ -199,6 +214,24 @@ func _CRUDService_Query_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CRUDService_QueryPage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryPageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CRUDServiceServer).QueryPage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CRUDService_QueryPage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CRUDServiceServer).QueryPage(ctx, req.(*QueryPageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CRUDService_ServiceDesc is the grpc.ServiceDesc for CRUDService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -221,6 +254,10 @@ var CRUDService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Query",
 			Handler:    _CRUDService_Query_Handler,
+		},
+		{
+			MethodName: "QueryPage",
+			Handler:    _CRUDService_QueryPage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

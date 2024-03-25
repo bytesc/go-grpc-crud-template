@@ -66,6 +66,7 @@ func main() {
 	crudRpcRouter.Use(gin.Logger(), gin.Recovery())
 	crud_rpc.AddPOST(crudRpcRouter)
 	crud_rpc.QueryGET(crudRpcRouter)
+	crud_rpc.QueryPageGET(crudRpcRouter)
 
 	filesRouter := r.Group("/api/files")
 	filesRouter.Use(gin.Logger(), gin.Recovery(), midware.CheckLogin("files", db))

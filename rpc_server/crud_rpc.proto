@@ -60,14 +60,16 @@ message QueryResponse {
 
 // 分页查询操作的请求和响应消息
 message QueryPageRequest {
-  int32 page = 1;
+  int32 pageNum = 1;
   int32 pageSize = 2;
+  map<string, string> queryParams = 3;
 }
 
 message QueryPageResponse {
-  bool success = 1;
-  string message = 2;
-  repeated CrudList lists = 3;
+  int32 code = 1;
+  int64 total = 2;
+  string message = 3;
+  repeated CrudList list = 4;
 }
 
 // 定义CRUD服务
@@ -83,4 +85,5 @@ service CRUDService {
 
   // 查询记录
   rpc Query (QueryRequest) returns (QueryResponse);
+  rpc QueryPage (QueryPageRequest) returns (QueryPageResponse);
 }
