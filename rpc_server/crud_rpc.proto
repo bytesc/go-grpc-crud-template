@@ -49,13 +49,13 @@ message UpdateResponse {
 
 // 查询操作的请求和响应消息
 message QueryRequest {
-  int32 id = 1;
+  string name=1;
 }
 
 message QueryResponse {
-  bool success = 1;
+  int32 code = 1;
   string message = 2;
-  CrudList list = 3;
+  repeated CrudList list = 3;
 }
 
 // 分页查询操作的请求和响应消息

@@ -35,7 +35,11 @@ func AddPOST(r *gin.RouterGroup) {
 				List: pbCL,
 			})
 			if err != nil {
-				return
+				c.JSON(200, gin.H{
+					"msg":  "添加失败",
+					"data": err.Error(),
+					"code": "400",
+				})
 			}
 			if result.Code != 0 {
 				c.JSON(200, gin.H{
