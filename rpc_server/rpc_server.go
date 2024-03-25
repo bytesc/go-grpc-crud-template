@@ -14,8 +14,8 @@ import (
 func main() {
 	var err error
 
-	viper.AddConfigPath("../conf/")
-	viper.SetConfigName("config")
+	viper.AddConfigPath("./conf/")
+	viper.SetConfigName("rpc_server_config")
 	viper.SetConfigType("yaml")
 
 	err = viper.ReadInConfig()
@@ -30,8 +30,9 @@ func main() {
 	}
 	err = service.Database.AutoMigrate(&mysql_db.CrudList{})
 
+	port := viper.GetString("server.Port")
 	// 监听端口
-	listen, err := net.Listen("tcp", ":8080")
+	listen, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		grpclog.Fatalf("Failed to listen: %v", err)
 	}
@@ -41,7 +42,7 @@ func main() {
 	server := service.GrpcServer{}
 	// 将server结构体注册为gRPC服务。
 	crud_pb.RegisterCRUDServiceServer(s, &server)
-	fmt.Println("grpc server running :8080")
+	fmt.Println("grpc server running :" + port)
 	// 开始处理客户端请求。
 	err = s.Serve(listen)
 }
