@@ -3,8 +3,8 @@ package crud_rpc
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"go_crud/crud_rpc_server/crud_pb"
 	"go_crud/mysql_db"
-	"go_crud/rpc_server/crud_pb"
 )
 
 func AddPOST(r *gin.RouterGroup) {

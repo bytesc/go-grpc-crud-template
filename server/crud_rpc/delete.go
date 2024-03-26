@@ -3,7 +3,7 @@ package crud_rpc
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"go_crud/rpc_server/crud_pb"
+	"go_crud/crud_rpc_server/crud_pb"
 	"strconv"
 )
 

@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go_crud/mysql_db"
+	"go_crud/server/user/user_dao"
 	"go_crud/server/user/utils"
 	"gorm.io/gorm"
 	"time"
@@ -36,7 +37,7 @@ func SignUpPost(r *gin.RouterGroup, DB *gorm.DB) {
 					"code": "400",
 				})
 			} else {
-				userDataList := utils.GetUserByName(signupData.Name, DB)
+				userDataList := user_dao.GetUserByName(signupData.Name, DB)
 				if len(userDataList) != 0 { //查到
 					c.JSON(200, gin.H{
 						"msg":  "用户已经存在",
@@ -60,7 +61,7 @@ func SignUpPost(r *gin.RouterGroup, DB *gorm.DB) {
 					}
 					userData.Password = utils.GetHash(rawPassword)
 					//hashBytes := sha256.Sum256([]byte(signupData.Password))
-					result := utils.CreateUser(userData, DB)
+					result := user_dao.CreateUser(userData, DB)
 					if result.Error != nil {
 						c.JSON(200, gin.H{
 							"msg":  "注册失败",

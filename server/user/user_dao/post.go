@@ -1,4 +1,4 @@
-package utils
+package user_dao
 
 import (
 	"go_crud/mysql_db"

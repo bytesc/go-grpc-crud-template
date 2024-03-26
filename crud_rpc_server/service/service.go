@@ -1,7 +1,7 @@
 package service
 
 import (
-	"go_crud/rpc_server/crud_pb"
+	"go_crud/crud_rpc_server/crud_pb"
 	"gorm.io/gorm"
 )
 
