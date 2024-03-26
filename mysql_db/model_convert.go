@@ -9,7 +9,7 @@ func CrudListOrmToRpc(dataList []CrudList, resultList *[]*crud_pb.CrudList) {
 	for _, cl := range dataList {
 		// 创建一个CrudList消息实例
 		crudList := &crud_pb.CrudList{
-			Id:       int32(cl.ID), // gorm.Model中的ID字段
+			Id:       int64(cl.ID), // gorm.Model中的ID字段
 			Name:     cl.Name,
 			Level:    cl.Level,
 			Email:    cl.Email,

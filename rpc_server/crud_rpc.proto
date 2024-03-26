@@ -7,7 +7,7 @@ option go_package = "./crud_pb";
 
 // 定义CrudList消息，对应于您的CrudList结构体
 message CrudList {
-  int32 id = 1; // gorm.Model中的ID字段
+  int64 id = 1; // gorm.Model中的ID字段
   string name = 2; // 名字
   string level = 3; // 级别
   string email = 4; // 邮箱
@@ -28,23 +28,23 @@ message AddResponse {
 
 // 删除操作的请求和响应消息
 message DeleteRequest {
-  int32 id = 1;
+  int64 id = 1;
 }
 
 message DeleteResponse {
-  bool success = 1;
+  int32 code = 1;
   string message = 2;
 }
 
 // 更新操作的请求和响应消息
 message UpdateRequest {
-  CrudList list = 1;
+  int64 id = 1;
+  CrudList list = 2;
 }
 
 message UpdateResponse {
-  bool success = 1;
+  int32 code = 1;
   string message = 2;
-  CrudList list = 3;
 }
 
 // 查询操作的请求和响应消息

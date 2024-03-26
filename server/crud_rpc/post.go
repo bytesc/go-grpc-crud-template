@@ -21,7 +21,7 @@ func AddPOST(r *gin.RouterGroup) {
 			//fmt.Println(err)
 		} else {
 			pbCL := &crud_pb.CrudList{
-				Id:       int32(listRes.ID),
+				Id:       int64(listRes.ID),
 				Name:     listRes.Name,
 				Level:    listRes.Level,
 				Email:    listRes.Email,
@@ -50,7 +50,7 @@ func AddPOST(r *gin.RouterGroup) {
 			} else {
 				c.JSON(200, gin.H{
 					"msg":  "添加成功",
-					"data": listRes,
+					"data": "",
 					"code": "200",
 				})
 			}

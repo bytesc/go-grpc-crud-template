@@ -18,7 +18,7 @@ func NewClient() crud_pb.CRUDServiceClient {
 	addr := etcd()
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf(fmt.Sprintf("grpc connect addr [%s] 连接失败 %s", addr, err))
+		log.Println(fmt.Sprintf("grpc connect addr [%s] 连接失败 %s", addr, err))
 	}
 	client := crud_pb.NewCRUDServiceClient(conn)
 	return client
@@ -33,7 +33,7 @@ func etcd() string {
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
-		log.Fatalf("Error creating etcd client: %v", err)
+		log.Printf("Error creating etcd client: %v \n", err)
 	}
 	defer etcdClient.Close()
 
@@ -43,11 +43,11 @@ func etcd() string {
 	//fmt.Println(resp)
 	cancel()
 	if err != nil {
-		log.Fatalf("failed to get service address from etcd: %v", err)
+		log.Printf("failed to get service address from etcd: %v \n", err)
 	}
 
 	if len(resp.Kvs) == 0 {
-		log.Fatalf("service address not found in etcd")
+		log.Println("service address not found in etcd")
 	}
 
 	//// 解析服务地址

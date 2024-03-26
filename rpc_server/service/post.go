@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"go_crud/mysql_db"
 	"go_crud/rpc_server/crud_pb"
 	"gorm.io/gorm"
 )
@@ -9,8 +10,11 @@ import (
 func (*GrpcServer) Add(c context.Context, req *crud_pb.AddRequest) (res *crud_pb.AddResponse, e error) {
 
 	db := Database.Session(&gorm.Session{NewDB: true})
-	request := req.GetList()
-	result := db.Create(&request)
+	var dataList []mysql_db.CrudList
+	var resultList []*crud_pb.CrudList
+	resultList = append(resultList, req.GetList())
+	mysql_db.CrudListRpcToOrm(resultList, &dataList)
+	result := db.Create(&dataList[0])
 	//fmt.Println(result)
 
 	if result.Error != nil {

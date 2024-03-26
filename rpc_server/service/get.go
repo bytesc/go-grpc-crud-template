@@ -11,8 +11,8 @@ func (*GrpcServer) Query(c context.Context, req *crud_pb.QueryRequest) (res *cru
 	db := Database.Session(&gorm.Session{NewDB: true})
 	var dataList []mysql_db.CrudList
 	var resultList []*crud_pb.CrudList
-	request := req.GetName()
-	result := db.Where("name = ?", request).Find(&dataList)
+	name := req.GetName()
+	result := db.Where("name = ?", name).Find(&dataList)
 
 	mysql_db.CrudListOrmToRpc(dataList, &resultList)
 

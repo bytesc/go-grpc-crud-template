@@ -40,7 +40,7 @@ func main() {
 	// 监听端口
 	listen, err := net.Listen("tcp", viper.GetString("server.Listen"))
 	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
+		log.Printf("Failed to listen: %v", err)
 	}
 
 	// 创建一个gRPC服务器实例。
@@ -65,7 +65,7 @@ func etcd() {
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
-		log.Fatalf("Error creating etcd client: %v", err)
+		log.Printf("Error creating etcd client: %v \n", err)
 	}
 	defer cli.Close()
 
@@ -76,30 +76,30 @@ func etcd() {
 	// 注册服务到etcd
 	leaseResp, err := cli.Grant(context.Background(), 10)
 	if err != nil {
-		log.Fatalf("Error granting lease: %v", err)
+		log.Printf("Error granting lease: %v \n", err)
 	}
 
 	// 设置键值对，其中键通常是服务名称，值是服务地址
 	putResp, err := cli.Put(context.Background(), serviceName, serviceAddr, clientv3.WithLease(leaseResp.ID))
 	if err != nil {
-		log.Fatalf("Error putting service to etcd: %v", err)
+		log.Printf("Error putting service to etcd: %v \n", err)
 	}
 	log.Println(putResp, serviceName, serviceAddr)
 
 	// 保持心跳，以续约租约
 	keepAliveChan, err := cli.KeepAlive(context.Background(), leaseResp.ID)
 	if err != nil {
-		log.Fatalf("Error keeping lease alive: %v", err)
+		log.Printf("Error keeping lease alive: %v \n", err)
 	}
 
 	for {
 		select {
 		case ka := <-keepAliveChan:
 			if ka == nil {
-				log.Fatalf("Lease expired or KeepAlive channel closed")
+				log.Println("Lease expired or KeepAlive channel closed")
 				return
 			}
-			fmt.Println(ka.String())
+			//log.Println(ka.String())
 		}
 	}
 }
