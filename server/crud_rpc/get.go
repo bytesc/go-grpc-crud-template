@@ -25,6 +25,14 @@ func QueryGET(r *gin.RouterGroup) {
 			})
 		}
 
+		if result.Code != 0 {
+			c.JSON(200, gin.H{
+				"msg":  "查询失败",
+				"data": result.Message,
+				"code": "400",
+			})
+		}
+
 		if len(result.List) == 0 { //没有查到
 			c.JSON(200, gin.H{
 				"msg":  "查询失败，数据不存在",
@@ -87,6 +95,14 @@ func QueryPageGET(r *gin.RouterGroup) {
 			c.JSON(200, gin.H{
 				"msg":  "查询失败",
 				"data": err.Error(),
+				"code": "400",
+			})
+		}
+
+		if result.Code != 0 {
+			c.JSON(200, gin.H{
+				"msg":  "查询失败",
+				"data": result.Message,
 				"code": "400",
 			})
 		}
