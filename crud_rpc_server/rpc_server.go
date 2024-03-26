@@ -7,7 +7,6 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go_crud/crud_rpc_server/crud_pb"
 	"go_crud/crud_rpc_server/service"
-	"go_crud/mysql_db"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -26,16 +25,7 @@ func main() {
 		panic(fmt.Sprintf("配置文件错误 %s", err.Error()))
 	}
 
-	service.Database, err = mysql_db.ConnectToDatabase("crud_db")
-	if err != nil {
-		fmt.Println("Error connecting to database:", err)
-		return
-	}
-	err = service.Database.AutoMigrate(&mysql_db.CrudList{})
-	if err != nil {
-		fmt.Println("Error init database:", err)
-		return
-	}
+	service.Init()
 
 	// 监听端口
 	listen, err := net.Listen("tcp", viper.GetString("server.Listen"))

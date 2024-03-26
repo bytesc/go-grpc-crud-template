@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"go_crud/mysql_db"
-	"go_crud/redis_cache"
 	"gorm.io/gorm"
 	"log"
 	"time"
 )
 
 func GetUserByName(name string, DB *gorm.DB) []mysql_db.UserList {
-	rdb := redis_cache.ConnectToRedis("user_redis")
+	rdb := RDB
 	var adminDataList []mysql_db.UserList
 
 	// 使用Redis缓存
@@ -26,13 +25,11 @@ func GetUserByName(name string, DB *gorm.DB) []mysql_db.UserList {
 			return adminDataList
 		}
 	}
-
 	// 如果Redis中没有缓存，则查询MySQL数据库
 	fmt.Println("从MySQL数据库中获取数据")
 	if err := DB.Where("name = ?", name).Find(&adminDataList).Error; err != nil {
 		return nil
 	}
-
 	// 将查询结果缓存到Redis
 	data, err := json.Marshal(adminDataList)
 	err = rdb.Set(ctx, key, data, 5*time.Minute).Err()

@@ -14,6 +14,7 @@ import (
 	"go_crud/server/files"
 	"go_crud/server/midware"
 	"go_crud/server/user"
+	"go_crud/server/user/user_dao"
 	"go_crud/server/utils"
 	"log"
 )
@@ -35,6 +36,8 @@ func main() {
 		fmt.Println("Error init database:", err)
 		return
 	}
+
+	user_dao.Init()
 
 	// 服务相关
 	r := server.CreateServer()
