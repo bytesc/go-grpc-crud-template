@@ -10,7 +10,6 @@ import (
 	"go_crud/logger"
 	"go_crud/mysql_db"
 	"go_crud/server"
-	"go_crud/server/crud"
 	"go_crud/server/crud_rpc"
 	"go_crud/server/files"
 	"go_crud/server/midware"
@@ -63,16 +62,8 @@ func main() {
 	user.ChangePwdPost(userRouter, userDb)
 	user.GetPubKey(userRouter)
 
-	crudRouter := r.Group("/api/crud")
-	crudRouter.Use(gin.Logger(), gin.Recovery(), midware.CheckLogin("crud", userDb))
-	crud.AddPOST(crudRouter, crudDb)
-	crud.DeletePOST(crudRouter, crudDb)
-	crud.UpdatePOST(crudRouter, crudDb)
-	crud.QueryGET(crudRouter, crudDb)
-	crud.QueryPageGET(crudRouter, crudDb)
-
-	crudRpcRouter := r.Group("/api/crud_rpc")
-	//, midware.CheckLogin("crud_rpc", db)
+	//crudRpcRouter := r.Group("/api/crud")
+	crudRpcRouter := r.Group("/api/crud", midware.CheckLogin("crud", userDb))
 	crudRpcRouter.Use(gin.Logger(), gin.Recovery())
 	crud_rpc.AddPOST(crudRpcRouter)
 	crud_rpc.QueryGET(crudRpcRouter)
