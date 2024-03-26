@@ -15,6 +15,7 @@ import (
 	"go_crud/server/midware"
 	"go_crud/server/user"
 	"go_crud/server/utils"
+	"log"
 )
 
 func main() {
@@ -28,12 +29,6 @@ func main() {
 		fmt.Println("Error connecting to database:", err)
 		return
 	}
-	crudDb, err := mysql_db.ConnectToDatabase("crud_db")
-	if err != nil {
-		fmt.Println("Error connecting to database:", err)
-		return
-	}
-	err = crudDb.AutoMigrate(&mysql_db.CrudList{})
 	err = userDb.AutoMigrate(&mysql_db.UserList{})
 
 	if err != nil {
@@ -45,9 +40,9 @@ func main() {
 	r := server.CreateServer()
 	r.Use(cors.Default()) //解决跨域
 
-	log, _ := logger.InitLogger(zap.DebugLevel)
-	defer log.Sync()
-	r.Use(logger.GinLogger(log), logger.GinRecovery(log, true))
+	serverLogger, _ := logger.InitLogger(zap.DebugLevel)
+	defer serverLogger.Sync()
+	r.Use(logger.GinLogger(serverLogger), logger.GinRecovery(serverLogger, true))
 
 	utils.PingGET(r)
 
@@ -83,6 +78,9 @@ func main() {
 	// http://127.0.0.1:8088/ping
 	//fmt.Println(r)
 
-	r.Run(viper.GetString("server.addr") + ":" + viper.GetString("server.port"))
+	err = r.Run(viper.GetString("server.addr") + ":" + viper.GetString("server.port"))
+	if err != nil {
+		log.Println(err.Error())
+	}
 
 }

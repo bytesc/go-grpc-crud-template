@@ -1,0 +1,18 @@
+cmd.txt
+
+go get google.golang.org/grpc
+go get -u google.golang.org/protobuf
+
+protoc --go_out=. --go-grpc_out=. --proto_path=. *proto
+
+go get -u go.etcd.io/etcd/client/v3
+import(
+	clientv3 "go.etcd.io/etcd/client/v3"
+)
+
+etcdctl get --prefix ""
+
+
+go get -u github.com/go-redis/redis/v8
+
+
