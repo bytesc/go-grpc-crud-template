@@ -11,17 +11,17 @@ import (
 	"time"
 )
 
-func ConnectToDatabase() (*gorm.DB, error) {
+func ConnectToDatabase(dbName string) (*gorm.DB, error) {
 	//链接数据库
 	// 参考 https://github.com/go-sql-driver/mysql#dsn-data-source-name 获取详情
 	//dsn := "root:123456@tcp(127.0.0.1:3306)/crud-list?charset=utf8mb4&parseTime=True&loc=Local"
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
-		viper.GetString("db.UserName"),
-		viper.GetString("db.Password"),
-		viper.GetString("db.Host"),
-		viper.GetString("db.Port"),
-		viper.GetString("db.Database"),
-		viper.GetString("db.Charset"))
+		viper.GetString(dbName+".UserName"),
+		viper.GetString(dbName+".Password"),
+		viper.GetString(dbName+".Host"),
+		viper.GetString(dbName+".Port"),
+		viper.GetString(dbName+".Database"),
+		viper.GetString(dbName+".Charset"))
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
@@ -59,7 +59,7 @@ func init() {
 }
 
 func main() {
-	db, err := ConnectToDatabase()
+	db, err := ConnectToDatabase("user_db")
 	if err != nil {
 		fmt.Println("Error connecting to database:", err)
 		return

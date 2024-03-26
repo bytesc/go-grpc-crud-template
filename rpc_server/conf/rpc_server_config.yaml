@@ -3,7 +3,7 @@ server:
   Listen: "0.0.0.0:8080"
   Addr: "127.0.0.1:8080"
 
-db:
+crud_db:
   DriverName: mysql
   Database: crud-list
   Port: 3306

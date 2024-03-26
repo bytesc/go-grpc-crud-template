@@ -2,7 +2,16 @@ server:
   Addr: 0.0.0.0
   Port: 8008
 
-db:
+user_db:
+  DriverName: mysql
+  Database: crud-list
+  Port: 3306
+  UserName: root
+  Password: 123456
+  Host: 127.0.0.1 #host.docker.internal #
+  Charset: utf8mb4
+
+crud_db:
   DriverName: mysql
   Database: crud-list
   Port: 3306

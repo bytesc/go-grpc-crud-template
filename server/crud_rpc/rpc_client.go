@@ -53,7 +53,7 @@ func etcd() string {
 	//// 解析服务地址
 	//serviceAddr := string(resp.Kvs[0].Value)
 
-	// 随机选择一个服务地址
+	// 随机选择一个服务地址，负载均衡
 	rand.Seed(time.Now().UnixNano())
 	serviceAddr := string(resp.Kvs[rand.Intn(len(resp.Kvs))].Value)
 

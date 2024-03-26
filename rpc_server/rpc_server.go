@@ -26,12 +26,16 @@ func main() {
 		panic(fmt.Sprintf("配置文件错误 %s", err.Error()))
 	}
 
-	service.Database, err = mysql_db.ConnectToDatabase()
+	service.Database, err = mysql_db.ConnectToDatabase("crud_db")
 	if err != nil {
 		fmt.Println("Error connecting to database:", err)
 		return
 	}
 	err = service.Database.AutoMigrate(&mysql_db.CrudList{})
+	if err != nil {
+		fmt.Println("Error init database:", err)
+		return
+	}
 
 	// 监听端口
 	listen, err := net.Listen("tcp", viper.GetString("server.Listen"))
@@ -95,7 +99,7 @@ func etcd() {
 				log.Fatalf("Lease expired or KeepAlive channel closed")
 				return
 			}
-			//fmt.Println(ka.String())
+			fmt.Println(ka.String())
 		}
 	}
 }
