@@ -1,5 +1,5 @@
 # go-grpc-crud-template
-✨基于 golang, grpc, gin 和 redis, MySQL, etcd 和 vue3 的简单分布式信息管理系统✨📌含完整前后端：分布式信息管理系统模板，后台管理系统模板，数据库管理系统模板。实现 grpc 远程过程调用，redis 缓存，etcd 服务发现，负载均衡。令牌签验，非对称加密。通过 Web 应用完成对数据库的增删改查(CRUD)，文件流的上传和下载。📌前后端分离
+✨基于 golang, grpc, gin 和 redis, MySQL, etcd 和 vue3 的简单分布式信息管理系统✨📌含完整前后端，微服务：分布式信息管理系统模板，后台管理系统模板，数据库管理系统模板。实现 grpc 微服务远程过程调用，redis 缓存，etcd 服务发现，负载均衡。令牌签验，非对称加密。通过 Web 应用完成对数据库的增删改查(CRUD)，文件流的上传和下载。📌前后端分离
 
 📌[在线演示链接](http://bytesc.top:8009)
 
