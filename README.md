@@ -1,6 +1,5 @@
-# go-crud-template
-
-✨基于 Go, gorm, gin 和 MySQL 和 vue3, axios 的简单信息管理系统模板✨📌含完整前后端，项目在线demo：信息管理系统模板，后台管理系统模板，数据库管理系统模板。实现令牌签验，非对称加密，通过 Web 应用完成对数据库的增删改查(CRUD)，文件流的上传和下载。📌前后端分离
+# go-grpc-crud-template
+✨基于 golang, grpc, gin 和 redis, MySQL, etcd 和 vue3 的简单分布式信息管理系统✨📌含完整前后端：分布式信息管理系统模板，后台管理系统模板，数据库管理系统模板。实现 grpc 远程过程调用，redis 缓存，etcd 服务发现，负载均衡。令牌签验，非对称加密。通过 Web 应用完成对数据库的增删改查(CRUD)，文件流的上传和下载。📌前后端分离
 
 📌[在线演示链接](http://bytesc.top:8009)
 
@@ -60,6 +59,8 @@
 
 - `go1.20.5`
 - `MySQL 8.0.31`
+- `Redis 7.2.4`
+- `etcd 3.4.31`
 
 ### 安装依赖
 （非必要，后续运行时候也会自动安装）
@@ -80,32 +81,93 @@ go get github.com/spf13/viper
 go get github.com/gin-gonic/gin/binding@v1.9.1
 
 go get -u github.com/gin-contrib/cors
+
+go get -u github.com/go-redis/redis/v8
+
+go get google.golang.org/grpc
+go get -u google.golang.org/protobuf
+
+go get -u go.etcd.io/etcd/client/v3
+
 ```
 
 ### 创建数据库
 
 登录`mysql`终端，创建数据库：
 ```sql
-create database  数据库名 default charset utf8mb4;
+create database crud_list default charset utf8mb4;
 ```
 
 ### 连接数据库
 
-`./conf/config.yaml` 为项目配置文件
+`./conf/config.yaml` 为 `api-gateway` 层配置文件
 
 修改其中
 ```yaml
-db:
+user_db:
   DriverName: mysql
-  Database: crud-list
+  Database: crud_list
   Port: 3306
   UserName: root
   Password: 123456
-  Host: 127.0.0.1
+  Host: 127.0.0.1 #host.docker.internal #
   Charset: utf8mb4
 ```
 
-如果需要使用其它数据库，例如 `PostgreSQL, SQLite, SQL Server`。`./mysql_db/connect_db.go` 为数据库配置文件。修改方法，参考 [grom 官方文档 数据库连接](https://gorm.io/zh_CN/docs/connecting_to_the_database.html)
+`./crud_rpc_server\conf\rpc_server_config.yaml` 为 `crud-service` 层配置文件
+
+修改其中
+```yaml
+crud_db:
+  DriverName: mysql
+  Database: crud_list
+  Port: 3306
+  UserName: root
+  Password: 123456
+  Host: 127.0.0.1 #host.docker.internal #
+  Charset: utf8mb4
+```
+
+上述两个数据库可以为两个完全独立的数据库，当然，也可以是同一个。如果需要使用其它数据库，例如 `PostgreSQL, SQLite, SQL Server`。`./mysql_db/connect_db.go` 为数据库配置文件。修改方法，参考 [grom 官方文档 数据库连接](https://gorm.io/zh_CN/docs/connecting_to_the_database.html)
+
+
+### 连接 redis
+
+`./conf/config.yaml` 
+
+修改其中
+```yaml
+user_redis:
+  Addr: "localhost:6379"
+  Password: "123456"
+```
+
+### 连接 etcd
+
+```bash
+etcd
+```
+
+`./conf/config.yaml` 
+
+修改其中  `Endpoint`
+```yaml
+etcd:
+  Endpoint: "127.0.0.1:2379"
+  keys:
+    crud_rpc: crud_rpc
+```
+
+`./crud_rpc_server\conf\rpc_server_config.yaml`
+
+修改其中
+```yaml
+etcd:
+  Endpoint: "127.0.0.1:2379"
+```
+
+这里两个配置必须连接同一个`etcd`集群
+
 
 ### 配置端口
 
@@ -116,21 +178,48 @@ server:
   Port: 8008
 ```
 这里 `0.0.0.0` 代表运行来自所有 ip 的访问
+ 
+如果需要启动多个微服务，每个微服务以下配置的 `Addr` 要不同
+
+`./crud_rpc_server\conf\rpc_server_config.yaml`
+```yaml
+server:
+  Name: crud_rpc
+  Listen: "0.0.0.0:8080"
+  Addr: "127.0.0.1:8080"
+```
+
 
 ### 运行
+
+#### api-gateway
 
 编译（会自动安装依赖）：
 ```bash
 go env -w GO111MODULE=on
 go env -w GOPROXY=https://goproxy.cn,direct
-go build # 整个文件夹
-# go build main.go # 单个文件
+go build main.go 
 ```
 
 运行：
 ```bash
-.\go_crud
+.\main
 ```
+
+#### crud 微服务
+
+编译（会自动安装依赖）：
+```bash
+cd ./crud_rpc_server
+go build rpc_server.go 
+```
+
+运行：
+```bash
+.\rpc_server
+```
+
+#### 测试
 
 浏览器输入 url:
 ```txt
@@ -142,10 +231,22 @@ http://localhost:8008/ping
 ```
 如果希望看到界面，需要用到配套的前端项目📌[配套前端项目地址](https://github.com/bytesc/vue-crud-template)
 
+### 修改 grpc proto
 
-### gin gorm 官方文档
+如果修改了`./crud_rpc_server/crud_rpc.proto` 需要重新生成代码
+
+```bash
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+protoc --go_out=. --go-grpc_out=. --proto_path=. *proto
+```
+
+
+### 框架官方文档
 - https://gorm.io/zh_CN/docs
 - https://gin-gonic.com/zh-cn/docs
+- https://grpc.io/docs/languages/go/quickstart/
+- https://doc.oschina.net/grpc?t=60133
+- https://protobuf.dev/programming-guides/proto3/
 
 
 # 开源许可证
