@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go_crud/server/user/user_dao"
 	"go_crud/server/user/utils"
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -14,7 +13,7 @@ type ChangePwdForm struct {
 	NewPassword string `json:"new_password"`
 }
 
-func ChangePwdPost(r *gin.RouterGroup, DB *gorm.DB) {
+func ChangePwdPost(r *gin.RouterGroup) {
 	r.POST("/change_pwd", func(c *gin.Context) {
 		Data := ChangePwdForm{}
 		err := c.ShouldBindJSON(&Data)
@@ -25,7 +24,7 @@ func ChangePwdPost(r *gin.RouterGroup, DB *gorm.DB) {
 				"code": "400",
 			})
 		} else {
-			userDataList := user_dao.GetUserByName(Data.Name, DB)
+			userDataList := user_dao.GetUserByName(Data.Name)
 			if len(userDataList) == 0 { //没有查到
 				c.JSON(200, gin.H{
 					"msg":  "用户不存在",
@@ -54,14 +53,14 @@ func ChangePwdPost(r *gin.RouterGroup, DB *gorm.DB) {
 							return
 						}
 						newPassword := utils.GetHash(rawNewPassword)
-						user_dao.SetUserPwd(userDataList[0], DB, newPassword)
+						user_dao.SetUserPwd(userDataList[0], newPassword)
 						c.JSON(200, gin.H{
 							"msg":  "修改成功",
 							"data": Data.Name,
 							"code": "234",
 						})
 					} else {
-						user_dao.RecordPasswordWrong(userDataList[0], DB, userDataList[0].PasswordTry+1)
+						user_dao.RecordPasswordWrong(userDataList[0], userDataList[0].PasswordTry+1)
 						c.JSON(200, gin.H{
 							"msg":  "密码错误",
 							"data": Data.Name,

@@ -4,10 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"go_crud/server/user/user_dao"
 	"go_crud/server/utils/token"
-	"gorm.io/gorm"
 )
 
-func LogoutGet(r *gin.RouterGroup, DB *gorm.DB) {
+func LogoutGet(r *gin.RouterGroup) {
 	r.GET("logout/", func(c *gin.Context) {
 		tokenData := c.GetHeader("token")
 		err := token.CheckRS(tokenData)
@@ -32,7 +31,7 @@ func LogoutGet(r *gin.RouterGroup, DB *gorm.DB) {
 			return
 		}
 		logoutName := claims.Data.(string)
-		userDataList := user_dao.GetUserByName(logoutName, DB)
+		userDataList := user_dao.GetUserByName(logoutName)
 		if len(userDataList) == 0 {
 			c.JSON(200, gin.H{
 				"msg":  "用户不存在",
@@ -41,7 +40,7 @@ func LogoutGet(r *gin.RouterGroup, DB *gorm.DB) {
 			})
 			return
 		}
-		user_dao.SetUserStatus(userDataList[0], DB, "out")
+		user_dao.SetUserStatus(userDataList[0], "out")
 		c.JSON(200, gin.H{
 			"msg":  "注销登录",
 			"data": logoutName,

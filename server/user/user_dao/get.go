@@ -10,8 +10,9 @@ import (
 	"time"
 )
 
-func GetUserByName(name string, DB *gorm.DB) []mysql_db.UserList {
+func GetUserByName(name string) []mysql_db.UserList {
 	rdb := RDB
+	db := DataBase.Session(&gorm.Session{NewDB: true})
 	var adminDataList []mysql_db.UserList
 
 	// 使用Redis缓存
@@ -27,7 +28,7 @@ func GetUserByName(name string, DB *gorm.DB) []mysql_db.UserList {
 	}
 	// 如果Redis中没有缓存，则查询MySQL数据库
 	//fmt.Println("从MySQL数据库中获取数据")
-	if err := DB.Where("name = ?", name).Find(&adminDataList).Error; err != nil {
+	if err := db.Where("name = ?", name).Find(&adminDataList).Error; err != nil {
 		return nil
 	}
 	// 将查询结果缓存到Redis

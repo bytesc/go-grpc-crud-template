@@ -5,8 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateUser(userData mysql_db.UserList, DB *gorm.DB) *gorm.DB {
-	db := DB.Session(&gorm.Session{NewDB: true})
+func CreateUser(userData mysql_db.UserList) *gorm.DB {
+	db := DataBase.Session(&gorm.Session{NewDB: true})
 	result := db.Create(&userData)
 	return result
 }

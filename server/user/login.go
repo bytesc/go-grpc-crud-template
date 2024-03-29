@@ -6,7 +6,6 @@ import (
 	"go_crud/server/user/user_dao"
 	"go_crud/server/user/utils"
 	"go_crud/server/utils/token"
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -15,7 +14,7 @@ type LoginForm struct {
 	Password string
 }
 
-func LoginPost(r *gin.RouterGroup, DB *gorm.DB) {
+func LoginPost(r *gin.RouterGroup) {
 	r.POST("/login", func(c *gin.Context) {
 		loginData := LoginForm{}
 		err := c.ShouldBindJSON(&loginData)
@@ -26,7 +25,7 @@ func LoginPost(r *gin.RouterGroup, DB *gorm.DB) {
 				"code": "400",
 			})
 		} else {
-			userDataList := user_dao.GetUserByName(loginData.Name, DB)
+			userDataList := user_dao.GetUserByName(loginData.Name)
 			if len(userDataList) == 0 { //没有查到
 				c.JSON(200, gin.H{
 					"msg":  "用户不存在",
@@ -45,8 +44,8 @@ func LoginPost(r *gin.RouterGroup, DB *gorm.DB) {
 					rawPassword, _ := utils.RsaDecode(loginData.Password)
 					loginPassword := utils.GetHash(rawPassword)
 					if userDataList[0].Password == loginPassword {
-						user_dao.RecordPasswordWrong(userDataList[0], DB, 0)
-						user_dao.SetUserStatus(userDataList[0], DB, "in")
+						user_dao.RecordPasswordWrong(userDataList[0], 0)
+						user_dao.SetUserStatus(userDataList[0], "in")
 						// 签发token
 						tokenDuration := time.Duration(viper.GetInt("token.shortDuration"))
 						longDuration := time.Duration(viper.GetInt("token.longDuration"))
@@ -61,7 +60,7 @@ func LoginPost(r *gin.RouterGroup, DB *gorm.DB) {
 							"code": "233",
 						})
 					} else {
-						user_dao.RecordPasswordWrong(userDataList[0], DB, userDataList[0].PasswordTry+1)
+						user_dao.RecordPasswordWrong(userDataList[0], userDataList[0].PasswordTry+1)
 						c.JSON(200, gin.H{
 							"msg":  "密码错误",
 							"data": loginData.Name,

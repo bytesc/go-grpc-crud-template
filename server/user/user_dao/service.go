@@ -4,14 +4,28 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"go_crud/mysql_db"
 	"go_crud/redis_cache"
+	"gorm.io/gorm"
 	"log"
 )
 
 var RDB *redis.Client
+var DataBase *gorm.DB
 
 func Init() {
 	RDB = redis_cache.ConnectToRedis("user_redis")
+	var err error
+	DataBase, err = mysql_db.ConnectToDatabase("user_db")
+	if err != nil {
+		fmt.Println("Error connecting to database:", err)
+		return
+	}
+	err = DataBase.AutoMigrate(&mysql_db.UserList{})
+	if err != nil {
+		fmt.Println("Error init database:", err)
+		return
+	}
 }
 
 func clearRedisCache(name string) {

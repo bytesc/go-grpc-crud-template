@@ -1,14 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go_crud/cmd"
 	"go_crud/logger"
-	"go_crud/mysql_db"
 	"go_crud/server"
 	"go_crud/server/crud_rpc"
 	"go_crud/server/files"
@@ -24,19 +22,6 @@ func main() {
 	defer cmd.Clean()
 	cmd.Start()
 
-	//数据库相关
-	userDb, err := mysql_db.ConnectToDatabase("user_db")
-	if err != nil {
-		fmt.Println("Error connecting to database:", err)
-		return
-	}
-	err = userDb.AutoMigrate(&mysql_db.UserList{})
-
-	if err != nil {
-		fmt.Println("Error init database:", err)
-		return
-	}
-
 	user_dao.Init()
 
 	// 服务相关
@@ -49,19 +34,19 @@ func main() {
 
 	utils.PingGET(r)
 
-	Router := r.Group("api/refresh", midware.CheckLogin("refresh", userDb))
+	Router := r.Group("api/refresh", midware.CheckLogin("refresh"))
 	utils.RefreshGET(Router)
 
 	userRouter := r.Group("api/user")
 	userRouter.Use(gin.Logger(), gin.Recovery())
-	user.LoginPost(userRouter, userDb)
-	user.SignUpPost(userRouter, userDb)
-	user.LogoutGet(userRouter, userDb)
-	user.ChangePwdPost(userRouter, userDb)
+	user.LoginPost(userRouter)
+	user.SignUpPost(userRouter)
+	user.LogoutGet(userRouter)
+	user.ChangePwdPost(userRouter)
 	user.GetPubKey(userRouter)
 
 	//crudRpcRouter := r.Group("/api/crud")
-	crudRpcRouter := r.Group("/api/crud", midware.CheckLogin("crud", userDb))
+	crudRpcRouter := r.Group("/api/crud", midware.CheckLogin("crud"))
 	crudRpcRouter.Use(gin.Logger(), gin.Recovery())
 	crud_rpc.AddPOST(crudRpcRouter)
 	crud_rpc.QueryGET(crudRpcRouter)
@@ -70,7 +55,7 @@ func main() {
 	crud_rpc.UpdatePOST(crudRpcRouter)
 
 	filesRouter := r.Group("/api/files")
-	filesRouter.Use(gin.Logger(), gin.Recovery(), midware.CheckLogin("files", userDb))
+	filesRouter.Use(gin.Logger(), gin.Recovery(), midware.CheckLogin("files"))
 	files.FileUploadPOST(filesRouter, nil)
 	files.BigFileUploadPOST(filesRouter, nil)
 	files.FileListGet(filesRouter, nil)
@@ -81,7 +66,7 @@ func main() {
 	// http://127.0.0.1:8088/ping
 	//fmt.Println(r)
 
-	err = r.Run(viper.GetString("server.addr") + ":" + viper.GetString("server.port"))
+	err := r.Run(viper.GetString("server.addr") + ":" + viper.GetString("server.port"))
 	if err != nil {
 		log.Println(err.Error())
 	}

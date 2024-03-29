@@ -5,13 +5,12 @@ import (
 	"github.com/spf13/viper"
 	"go_crud/server/user/user_dao"
 	"go_crud/server/utils/token"
-	"gorm.io/gorm"
 	"time"
 )
 
 //var token string = "123456"
 
-func CheckLogin(param string, DB *gorm.DB) gin.HandlerFunc {
+func CheckLogin(param string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//fmt.Println("checking", param)
 		//accessToken := c.Request.Header.Get("access_token")
@@ -74,7 +73,7 @@ func CheckLogin(param string, DB *gorm.DB) gin.HandlerFunc {
 		}
 		tokenDuration := time.Duration(viper.GetInt("token.shortDuration"))
 		// 验证账号锁定
-		userDataList := user_dao.GetUserByName(claims.Data.(string), DB)
+		userDataList := user_dao.GetUserByName(claims.Data.(string))
 		if len(userDataList) == 0 { //没有查到
 			c.JSON(200, gin.H{
 				"msg":  "用户不存在",

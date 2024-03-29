@@ -7,7 +7,6 @@ import (
 	"go_crud/mysql_db"
 	"go_crud/server/user/user_dao"
 	"go_crud/server/user/utils"
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -17,7 +16,7 @@ type SignupForm struct {
 	Password string `validate:"required"`
 }
 
-func SignUpPost(r *gin.RouterGroup, DB *gorm.DB) {
+func SignUpPost(r *gin.RouterGroup) {
 	r.POST("/signup", func(c *gin.Context) {
 		signupData := SignupForm{}
 		err := c.ShouldBindJSON(&signupData)
@@ -37,7 +36,7 @@ func SignUpPost(r *gin.RouterGroup, DB *gorm.DB) {
 					"code": "400",
 				})
 			} else {
-				userDataList := user_dao.GetUserByName(signupData.Name, DB)
+				userDataList := user_dao.GetUserByName(signupData.Name)
 				if len(userDataList) != 0 { //查到
 					c.JSON(200, gin.H{
 						"msg":  "用户已经存在",
@@ -61,7 +60,7 @@ func SignUpPost(r *gin.RouterGroup, DB *gorm.DB) {
 					}
 					userData.Password = utils.GetHash(rawPassword)
 					//hashBytes := sha256.Sum256([]byte(signupData.Password))
-					result := user_dao.CreateUser(userData, DB)
+					result := user_dao.CreateUser(userData)
 					if result.Error != nil {
 						c.JSON(200, gin.H{
 							"msg":  "注册失败",
