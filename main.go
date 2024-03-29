@@ -1,11 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"go_crud/cmd"
 	"go_crud/logger"
 	"go_crud/server"
 	"go_crud/server/crud_rpc"
@@ -19,8 +19,14 @@ import (
 
 func main() {
 	//配置相关
-	defer cmd.Clean()
-	cmd.Start()
+	viper.AddConfigPath("./conf/")
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Sprintf("配置文件错误 %s", err.Error()))
+	}
 
 	user_dao.Init()
 
@@ -66,7 +72,7 @@ func main() {
 	// http://127.0.0.1:8088/ping
 	//fmt.Println(r)
 
-	err := r.Run(viper.GetString("server.addr") + ":" + viper.GetString("server.port"))
+	err = r.Run(viper.GetString("server.addr") + ":" + viper.GetString("server.port"))
 	if err != nil {
 		log.Println(err.Error())
 	}

@@ -11,6 +11,14 @@ import (
 )
 
 func GetUserByName(name string) []mysql_db.UserList {
+	lockKey := "user_status_lock_" + name
+	if !RedisLock(lockKey) {
+		// 如果获取锁失败，则直接返回或者进行重试等策略
+		log.Println("Failed to acquire lock for user status update")
+		return nil
+	}
+	defer RedisUnLock(lockKey)
+
 	rdb := RDB
 	db := DataBase.Session(&gorm.Session{NewDB: true})
 	var adminDataList []mysql_db.UserList

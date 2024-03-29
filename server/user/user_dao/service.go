@@ -8,6 +8,7 @@ import (
 	"go_crud/redis_cache"
 	"gorm.io/gorm"
 	"log"
+	"time"
 )
 
 var RDB *redis.Client
@@ -51,4 +52,32 @@ func clearEntireRedisCache() {
 	} else {
 		log.Println("Successfully cleared entire Redis cache")
 	}
+}
+
+var ctx = context.Background()
+
+func RedisLock(key string) bool {
+	startTime := time.Now()
+	for {
+		bool, err := RDB.SetNX(ctx, key, 1, 10*time.Second).Result()
+		if err != nil {
+			log.Println(err.Error())
+		}
+		if bool {
+			return true
+		}
+		time.Sleep(1 * time.Second)
+		if time.Since(startTime) > 10*time.Second {
+			return false
+		}
+	}
+}
+
+func RedisUnLock(key string) int64 {
+	nums, err := RDB.Del(ctx, key).Result()
+	if err != nil {
+		log.Println(err.Error())
+		return 0
+	}
+	return nums
 }
