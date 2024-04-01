@@ -29,9 +29,10 @@ func Init() {
 		fmt.Println("Error init database:", err)
 		return
 	}
+	ClearEntireRedisCache()
 }
 
-func clearRedisCache(name string) {
+func ClearRedisCache(name string) {
 	// 连接到 Redis
 	rdb := RDB
 	// 删除与用户 ID 相关的缓存
@@ -43,9 +44,11 @@ func clearRedisCache(name string) {
 	}
 }
 
-func clearEntireRedisCache() {
+func ClearEntireRedisCache() {
 	// 使用context.Background()作为请求的上下文
 	ctx := context.Background()
+
+	log.Println("清除redis")
 
 	// 使用FlushDB命令清空当前数据库
 	err := RDB.FlushDB(ctx).Err()

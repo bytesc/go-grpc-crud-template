@@ -15,9 +15,9 @@ func RecordPasswordWrong(userData mysql_db.UserList, tries uint) bool {
 		userData.LockedUntil = time.Now().Add(time.Hour)
 		userData.PasswordTry = 0
 	}
-	go clearRedisCache(userData.Name)
+	go ClearRedisCache(userData.Name)
 	db.Save(&userData)
-	go clearRedisCache(userData.Name)
+	go ClearRedisCache(userData.Name)
 	return true
 }
 
@@ -49,15 +49,15 @@ func SetUserStatus(userData mysql_db.UserList, status string) bool {
 	userData.Status = status
 	db.Save(&userData)
 	//time.Sleep(time.Minute)
-	clearRedisCache(userData.Name)
+	ClearRedisCache(userData.Name)
 	return true
 }
 
 func SetUserPwd(userData mysql_db.UserList, newPwd string) bool {
 	db := DataBase.Session(&gorm.Session{NewDB: true})
 	userData.Password = newPwd
-	go clearRedisCache(userData.Name)
+	go ClearRedisCache(userData.Name)
 	db.Save(&userData)
-	go clearRedisCache(userData.Name)
+	go ClearRedisCache(userData.Name)
 	return true
 }
