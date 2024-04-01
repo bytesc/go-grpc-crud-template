@@ -15,4 +15,8 @@ etcdctl get --prefix ""
 
 go get -u github.com/go-redis/redis/v8
 
+go get github.com/go-redsync/redsync/v4
+go get github.com/go-redsync/redsync/v4/redis/goredis/v8
+
+
 

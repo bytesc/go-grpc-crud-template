@@ -4,18 +4,20 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"github.com/go-redsync/redsync/v4"
 	"go_crud/mysql_db"
 	"go_crud/redis_cache"
 	"gorm.io/gorm"
 	"log"
-	"time"
 )
 
 var RDB *redis.Client
 var DataBase *gorm.DB
+var RedSyncLock *redsync.Redsync
 
 func Init() {
 	RDB = redis_cache.ConnectToRedis("user_redis")
+	RedSyncLock = redis_cache.NewSync(RDB)
 	var err error
 	DataBase, err = mysql_db.ConnectToDatabase("user_db")
 	if err != nil {
@@ -52,32 +54,4 @@ func clearEntireRedisCache() {
 	} else {
 		log.Println("Successfully cleared entire Redis cache")
 	}
-}
-
-var ctx = context.Background()
-
-func RedisLock(key string) bool {
-	startTime := time.Now()
-	for {
-		bool, err := RDB.SetNX(ctx, key, 1, 10*time.Second).Result()
-		if err != nil {
-			log.Println(err.Error())
-		}
-		if bool {
-			return true
-		}
-		time.Sleep(1 * time.Second)
-		if time.Since(startTime) > 10*time.Second {
-			return false
-		}
-	}
-}
-
-func RedisUnLock(key string) int64 {
-	nums, err := RDB.Del(ctx, key).Result()
-	if err != nil {
-		log.Println(err.Error())
-		return 0
-	}
-	return nums
 }

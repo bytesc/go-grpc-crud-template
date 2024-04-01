@@ -84,6 +84,9 @@ go get -u github.com/gin-contrib/cors
 
 go get -u github.com/go-redis/redis/v8
 
+go get github.com/go-redsync/redsync/v4
+go get github.com/go-redsync/redsync/v4/redis/goredis/v8
+
 go get google.golang.org/grpc
 go get -u google.golang.org/protobuf
 
