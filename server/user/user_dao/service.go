@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redsync/redsync/v4"
-	"go_crud/mysql_db"
-	"go_crud/redis_cache"
+	mysql_db2 "go_crud/utils/mysql_db"
+	"go_crud/utils/redis_cache"
 	"gorm.io/gorm"
 	"log"
 )
@@ -17,14 +17,14 @@ var RedSyncLock *redsync.Redsync
 
 func Init() {
 	RDB = redis_cache.ConnectToRedis("user_redis")
-	RedSyncLock = redis_cache.NewSync(RDB)
+	RedSyncLock = redis_cache.NewSync(redis_cache.ConnectToRedis("lock_redis"))
 	var err error
-	DataBase, err = mysql_db.ConnectToDatabase("user_db")
+	DataBase, err = mysql_db2.ConnectToDatabase("user_db")
 	if err != nil {
 		fmt.Println("Error connecting to database:", err)
 		return
 	}
-	err = DataBase.AutoMigrate(&mysql_db.UserList{})
+	err = DataBase.AutoMigrate(&mysql_db2.UserList{})
 	if err != nil {
 		fmt.Println("Error init database:", err)
 		return
@@ -32,7 +32,7 @@ func Init() {
 	ClearEntireRedisCache()
 }
 
-func ClearRedisCache(name string) {
+func ClearNameRedisCache(name string) {
 	// 连接到 Redis
 	rdb := RDB
 	// 删除与用户 ID 相关的缓存

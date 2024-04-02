@@ -13,4 +13,5 @@ crud_db:
   Charset: utf8mb4
 
 etcd:
-  Endpoint: "127.0.0.1:2379"
+  Endpoints:
+    - "127.0.0.1:2379"

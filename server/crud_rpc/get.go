@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"go_crud/crud_rpc_server/crud_pb"
-	"go_crud/mysql_db"
+	mysql_db2 "go_crud/utils/mysql_db"
 	"net/url"
 	"strconv"
 )
@@ -12,7 +12,7 @@ import (
 func QueryGET(r *gin.RouterGroup) {
 	r.GET("/list/:name", func(c *gin.Context) {
 		name := c.Param("name")
-		var dataList []mysql_db.CrudList
+		var dataList []mysql_db2.CrudList
 		client := NewClient()
 		result, err := client.Query(context.Background(), &crud_pb.QueryRequest{
 			Name: name,
@@ -40,7 +40,7 @@ func QueryGET(r *gin.RouterGroup) {
 				"code": "400",
 			})
 		} else {
-			mysql_db.CrudListRpcToOrm(result.List, &dataList)
+			mysql_db2.CrudListRpcToOrm(result.List, &dataList)
 			c.JSON(200, gin.H{
 				"msg":  "查询成功",
 				"data": dataList,
@@ -53,7 +53,7 @@ func QueryGET(r *gin.RouterGroup) {
 // QueryPageGET 分页查询
 func QueryPageGET(r *gin.RouterGroup) {
 	r.GET("/list/", func(c *gin.Context) {
-		var dataList []mysql_db.CrudList
+		var dataList []mysql_db2.CrudList
 		var pageSize, pageNum int
 		pageSizeStr := c.Query("pageSize")
 		pageNumStr := c.Query("pageNum")
@@ -107,7 +107,7 @@ func QueryPageGET(r *gin.RouterGroup) {
 			})
 		}
 
-		mysql_db.CrudListRpcToOrm(result.List, &dataList)
+		mysql_db2.CrudListRpcToOrm(result.List, &dataList)
 
 		if len(dataList) == 0 { //没有查到
 			c.JSON(200, gin.H{

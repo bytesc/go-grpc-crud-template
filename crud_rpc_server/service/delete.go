@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"go_crud/crud_rpc_server/crud_pb"
-	"go_crud/mysql_db"
+	"go_crud/utils/mysql_db"
 	"gorm.io/gorm"
 )
 

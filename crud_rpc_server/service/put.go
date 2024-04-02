@@ -3,18 +3,18 @@ package service
 import (
 	"context"
 	"go_crud/crud_rpc_server/crud_pb"
-	"go_crud/mysql_db"
+	mysql_db2 "go_crud/utils/mysql_db"
 	"gorm.io/gorm"
 )
 
 func (*GrpcServer) Update(c context.Context, req *crud_pb.UpdateRequest) (res *crud_pb.UpdateResponse, e error) {
 
 	db := Database.Session(&gorm.Session{NewDB: true})
-	var dataList []mysql_db.CrudList
+	var dataList []mysql_db2.CrudList
 	var resultList []*crud_pb.CrudList
 	id := req.GetId()
 
-	var tmpDataList []mysql_db.CrudList
+	var tmpDataList []mysql_db2.CrudList
 	result := db.Where("id = ?", id).Find(&tmpDataList) //数据库查找
 	//fmt.Println(tmpDataList)
 	//db.Where("name = ?", "张三").Find(&dataList)
@@ -34,7 +34,7 @@ func (*GrpcServer) Update(c context.Context, req *crud_pb.UpdateRequest) (res *c
 		}, nil
 	} else {
 		resultList = append(resultList, req.List)
-		mysql_db.CrudListRpcToOrm(resultList, &dataList)
+		mysql_db2.CrudListRpcToOrm(resultList, &dataList)
 		dataList[0].ID = uint(id)
 		result := db.Where("id = ?", id).Updates(&dataList[0])
 		if result.RowsAffected == 0 {

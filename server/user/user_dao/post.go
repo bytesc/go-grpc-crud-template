@@ -2,7 +2,7 @@ package user_dao
 
 import (
 	"github.com/go-redsync/redsync/v4"
-	"go_crud/mysql_db"
+	"go_crud/utils/mysql_db"
 	"gorm.io/gorm"
 	"log"
 	"time"
@@ -15,9 +15,9 @@ func RecordPasswordWrong(userData mysql_db.UserList, tries uint) bool {
 		userData.LockedUntil = time.Now().Add(time.Hour)
 		userData.PasswordTry = 0
 	}
-	go ClearRedisCache(userData.Name)
+	go ClearNameRedisCache(userData.Name)
 	db.Save(&userData)
-	go ClearRedisCache(userData.Name)
+	go ClearNameRedisCache(userData.Name)
 	return true
 }
 
@@ -49,15 +49,15 @@ func SetUserStatus(userData mysql_db.UserList, status string) bool {
 	userData.Status = status
 	db.Save(&userData)
 	//time.Sleep(time.Minute)
-	ClearRedisCache(userData.Name)
+	ClearNameRedisCache(userData.Name)
 	return true
 }
 
 func SetUserPwd(userData mysql_db.UserList, newPwd string) bool {
 	db := DataBase.Session(&gorm.Session{NewDB: true})
 	userData.Password = newPwd
-	go ClearRedisCache(userData.Name)
+	go ClearNameRedisCache(userData.Name)
 	db.Save(&userData)
-	go ClearRedisCache(userData.Name)
+	go ClearNameRedisCache(userData.Name)
 	return true
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go_crud/mysql_db"
+	"go_crud/utils/mysql_db"
 	"gorm.io/gorm"
 	"log"
 	"time"

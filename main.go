@@ -29,6 +29,7 @@ func main() {
 	}
 
 	user_dao.Init()
+	crud_rpc.Init()
 
 	// 服务相关
 	r := server.CreateServer()

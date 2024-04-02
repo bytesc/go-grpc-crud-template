@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"go_crud/crud_rpc_server/crud_pb"
-	"go_crud/mysql_db"
+	"go_crud/utils/mysql_db"
 )
 
 func AddPOST(r *gin.RouterGroup) {

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"go_crud/mysql_db"
 	"go_crud/server/user/user_dao"
 	"go_crud/server/user/utils"
+	"go_crud/utils/mysql_db"
 	"time"
 )
 
