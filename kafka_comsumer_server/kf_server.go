@@ -8,12 +8,6 @@ import (
 	"log"
 )
 
-// Message 结构体用来解析Kafka消息中的JSON
-type Message struct {
-	Name      string `json:"name"`
-	Timestamp int64  `json:"timestamp"`
-}
-
 func main() {
 
 	service.Init()
@@ -21,14 +15,14 @@ func main() {
 	for {
 		// 读取下一条消息
 		ctx := context.Background()
-		msg, err := service.KF_READER.ReadMessage(ctx)
+		msg, err := service.KfReader.ReadMessage(ctx)
 		if err != nil {
 			log.Printf("error while receiving message: %s\n", err)
 			break
 		}
 
 		// 解析消息
-		var m Message
+		var m service.Message
 		if err := json.Unmarshal(msg.Value, &m); err != nil {
 			log.Printf("error while unmarshaling message: %s\n", err)
 			continue
@@ -42,7 +36,7 @@ func main() {
 	}
 
 	// 关闭reader
-	if err := service.KF_READER.Close(); err != nil {
+	if err := service.KfReader.Close(); err != nil {
 		log.Println("failed to close reader:", err)
 	}
 }

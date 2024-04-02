@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func NewKafkaReader(mqName string) *kafka.Reader {
+func NewKafkaConsumer(mqName string) *kafka.Reader {
 	// 创建Kafka reader
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   viper.GetStringSlice(mqName + ".broker"),
@@ -16,4 +16,13 @@ func NewKafkaReader(mqName string) *kafka.Reader {
 	})
 
 	return r
+}
+
+func NewKafkaProducer(mqName string) *kafka.Writer {
+	writer := kafka.NewWriter(kafka.WriterConfig{
+		Brokers: viper.GetStringSlice(mqName + ".broker"),
+		Topic:   viper.GetString(mqName + ".topic"),
+	})
+
+	return writer
 }

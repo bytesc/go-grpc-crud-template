@@ -9,20 +9,29 @@ import (
 )
 
 func RecordPasswordWrong(userData mysql_db.UserList, tries uint) bool {
+	// 方式一 分布式锁 强一致性
+	lock := service.GetRedLock(userData.Name)
+	// 尝试获取锁
+	if err := lock.Lock(); err != nil {
+		log.Println("获取锁失败:", err)
+		return false
+	}
+	defer lock.Unlock()
+	go service.ContinueLock(lock)
+
 	db := service.DataBase.Session(&gorm.Session{NewDB: true})
 	userData.PasswordTry = tries
 	if userData.PasswordTry >= 10 {
 		userData.LockedUntil = time.Now().Add(time.Hour)
 		userData.PasswordTry = 0
 	}
-	go service.ClearNameRedisCache(userData.Name)
 	db.Save(&userData)
 	go service.ClearNameRedisCache(userData.Name)
 	return true
 }
 
 func SetUserStatus(userData mysql_db.UserList, status string) bool {
-
+	// 方式一 分布式锁 强一致性
 	lock := service.GetRedLock(userData.Name)
 	// 尝试获取锁
 	if err := lock.Lock(); err != nil {
@@ -34,7 +43,6 @@ func SetUserStatus(userData mysql_db.UserList, status string) bool {
 
 	db := service.DataBase.Session(&gorm.Session{NewDB: true})
 	userData.Status = status
-	go service.ClearNameRedisCache(userData.Name)
 	db.Save(&userData)
 	go service.ClearNameRedisCache(userData.Name)
 	return true
@@ -43,8 +51,9 @@ func SetUserStatus(userData mysql_db.UserList, status string) bool {
 func SetUserPwd(userData mysql_db.UserList, newPwd string) bool {
 	db := service.DataBase.Session(&gorm.Session{NewDB: true})
 	userData.Password = newPwd
+	// 方式二 双删 弱一致性
 	go service.ClearNameRedisCache(userData.Name)
 	db.Save(&userData)
-	go service.ClearNameRedisCache(userData.Name)
+	go service.SendMsgToMq(userData.Name, time.Now().Add(1000*time.Millisecond))
 	return true
 }

@@ -19,6 +19,10 @@ lock_redis:
   Addr: "localhost:6379"
   Password: "123456"
 
+user_cache_kafka:
+  topic: "user_cache"
+  broker:
+    - "127.0.0.1:9092"
 
 # token 签发配置
 token:
