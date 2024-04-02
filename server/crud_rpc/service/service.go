@@ -1,4 +1,4 @@
-package crud_rpc
+package service
 
 import (
 	clientv3 "go.etcd.io/etcd/client/v3"

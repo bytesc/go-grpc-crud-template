@@ -9,10 +9,11 @@ import (
 	"go_crud/logger"
 	"go_crud/server"
 	"go_crud/server/crud_rpc"
+	crudService "go_crud/server/crud_rpc/service"
 	"go_crud/server/files"
 	"go_crud/server/midware"
 	"go_crud/server/user"
-	"go_crud/server/user/user_dao"
+	userService "go_crud/server/user/user_dao/service"
 	"go_crud/server/utils"
 	"log"
 )
@@ -28,8 +29,8 @@ func main() {
 		panic(fmt.Sprintf("配置文件错误 %s", err.Error()))
 	}
 
-	user_dao.Init()
-	crud_rpc.Init()
+	userService.Init()
+	crudService.Init()
 
 	// 服务相关
 	r := server.CreateServer()

@@ -2,6 +2,7 @@ package user_dao
 
 import (
 	"github.com/go-redsync/redsync/v4"
+	"go_crud/server/user/user_dao/service"
 	"go_crud/utils/mysql_db"
 	"gorm.io/gorm"
 	"log"
@@ -9,21 +10,21 @@ import (
 )
 
 func RecordPasswordWrong(userData mysql_db.UserList, tries uint) bool {
-	db := DataBase.Session(&gorm.Session{NewDB: true})
+	db := service.DataBase.Session(&gorm.Session{NewDB: true})
 	userData.PasswordTry = tries
 	if userData.PasswordTry >= 10 {
 		userData.LockedUntil = time.Now().Add(time.Hour)
 		userData.PasswordTry = 0
 	}
-	go ClearNameRedisCache(userData.Name)
+	go service.ClearNameRedisCache(userData.Name)
 	db.Save(&userData)
-	go ClearNameRedisCache(userData.Name)
+	go service.ClearNameRedisCache(userData.Name)
 	return true
 }
 
 func SetUserStatus(userData mysql_db.UserList, status string) bool {
 
-	lock := RedSyncLock.NewMutex("lock:user:"+userData.Name,
+	lock := service.RedSyncLock.NewMutex("lock:user:"+userData.Name,
 		redsync.WithExpiry(10*time.Second),
 		redsync.WithTries(5), // 设置尝试获取锁的最大次数为5次
 		redsync.WithRetryDelay(1*time.Second))
@@ -45,19 +46,19 @@ func SetUserStatus(userData mysql_db.UserList, status string) bool {
 	//	}
 	//}()
 
-	db := DataBase.Session(&gorm.Session{NewDB: true})
+	db := service.DataBase.Session(&gorm.Session{NewDB: true})
 	userData.Status = status
 	db.Save(&userData)
 	//time.Sleep(time.Minute)
-	ClearNameRedisCache(userData.Name)
+	service.ClearNameRedisCache(userData.Name)
 	return true
 }
 
 func SetUserPwd(userData mysql_db.UserList, newPwd string) bool {
-	db := DataBase.Session(&gorm.Session{NewDB: true})
+	db := service.DataBase.Session(&gorm.Session{NewDB: true})
 	userData.Password = newPwd
-	go ClearNameRedisCache(userData.Name)
+	go service.ClearNameRedisCache(userData.Name)
 	db.Save(&userData)
-	go ClearNameRedisCache(userData.Name)
+	go service.ClearNameRedisCache(userData.Name)
 	return true
 }

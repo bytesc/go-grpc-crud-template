@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go_crud/server/user/user_dao/service"
 	"go_crud/utils/mysql_db"
 	"gorm.io/gorm"
 	"log"
@@ -19,8 +20,8 @@ func GetUserByName(name string) []mysql_db.UserList {
 	//}
 	//defer lock.Unlock()
 
-	rdb := RDB
-	db := DataBase.Session(&gorm.Session{NewDB: true})
+	rdb := service.RDB
+	db := service.DataBase.Session(&gorm.Session{NewDB: true})
 	var adminDataList []mysql_db.UserList
 
 	// 使用Redis缓存
