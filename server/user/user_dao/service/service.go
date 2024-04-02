@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redsync/redsync/v4"
@@ -9,6 +10,7 @@ import (
 	"go_crud/utils/redis_cache"
 	"gorm.io/gorm"
 	"log"
+	"time"
 )
 
 var RDB *redis.Client
@@ -30,6 +32,34 @@ func Init() {
 		return
 	}
 	ClearEntireRedisCache()
+}
+
+func GetFromRedisByName(name string) []mysql_db.UserList {
+	ctx := context.Background()
+	var adminDataList []mysql_db.UserList
+	key := fmt.Sprintf("user:%s", name)
+	result, err := RDB.Get(ctx, key).Result()
+	if err == nil {
+		// 如果Redis中存在缓存，则直接返回
+		//fmt.Println("从Redis缓存中获取数据")
+		if err := json.Unmarshal([]byte(result), &adminDataList); err == nil {
+			return adminDataList
+		}
+	}
+	return nil
+}
+
+func SetNameToRedis(name string, adminDataList []mysql_db.UserList) bool {
+	// 将查询结果缓存到Redis
+	ctx := context.Background()
+	key := fmt.Sprintf("user:%s", name)
+	data, err := json.Marshal(adminDataList)
+	err = RDB.Set(ctx, key, data, 5*time.Minute).Err()
+	if err != nil {
+		log.Println("Redis缓存失败：", err.Error())
+		return false
+	}
+	return true
 }
 
 func ClearNameRedisCache(name string) {
