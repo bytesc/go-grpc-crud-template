@@ -40,6 +40,8 @@ func Init() {
 	KfReader = kafka_mq.NewKafkaConsumer("user_cache_kafka")
 
 	heap.Init(&TaskHeap)
+
+	MsgSignal = make(chan int)
 }
 
 func ClearNameRedisCache(name string) bool {

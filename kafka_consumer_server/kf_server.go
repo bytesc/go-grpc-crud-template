@@ -2,6 +2,7 @@ package main
 
 import (
 	"go_crud/kafka_consumer_server/service"
+	"log"
 	"sync"
 )
 
@@ -22,5 +23,6 @@ func main() {
 		service.TaskWorker()
 	}()
 
+	log.Println("kafka consumer running")
 	wg.Wait()
 }
