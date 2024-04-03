@@ -1,6 +1,7 @@
 package service
 
 import (
+	"container/heap"
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
@@ -20,6 +21,8 @@ type Message struct {
 var RDB *redis.Client
 var KfReader *kafka.Reader
 
+var TaskHeap DelayedTaskHeap
+
 func Init() {
 	var err error
 
@@ -35,6 +38,8 @@ func Init() {
 	RDB = redis_cache.ConnectToRedis("user_redis")
 
 	KfReader = kafka_mq.NewKafkaConsumer("user_cache_kafka")
+
+	heap.Init(&TaskHeap)
 }
 
 func ClearNameRedisCache(name string) {

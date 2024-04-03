@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/segmentio/kafka-go"
-	mqService "go_crud/kafka_comsumer_server/service"
+	mqService "go_crud/kafka_consumer_server/service"
 	"log"
 	"time"
 )
