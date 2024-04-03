@@ -42,12 +42,14 @@ func Init() {
 	heap.Init(&TaskHeap)
 }
 
-func ClearNameRedisCache(name string) {
+func ClearNameRedisCache(name string) bool {
 	// 连接到 Redis
 	rdb := RDB
 	ctx := context.Background()
 	_, err := rdb.Del(ctx, name).Result()
 	if err != nil {
 		log.Printf("Failed to clear Redis cache for user ID %s: %v", name, err)
+		return false
 	}
+	return true
 }

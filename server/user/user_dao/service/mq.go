@@ -12,7 +12,7 @@ import (
 func SendMsgToMq(name string, time time.Time) {
 	msg := &mqService.Message{
 		Name:      "user:" + name,
-		Timestamp: time.Unix(),
+		Timestamp: time.UnixNano(),
 	}
 	// 将消息序列化为JSON
 	jsonBytes, err := json.Marshal(msg)
@@ -28,5 +28,5 @@ func SendMsgToMq(name string, time time.Time) {
 		log.Printf("Error sending message: %v", err)
 	}
 
-	log.Println("Message sent to Kafka successfully")
+	//log.Println("Message sent to Kafka successfully")
 }

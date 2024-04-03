@@ -6,7 +6,7 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go_crud/crud_rpc_server/crud_pb"
 	"go_crud/utils/etcd_center"
-	mysql_db2 "go_crud/utils/mysql_db"
+	"go_crud/utils/mysql_db"
 	"gorm.io/gorm"
 )
 
@@ -29,12 +29,12 @@ func Init() {
 		panic(fmt.Sprintf("配置文件错误 %s", err.Error()))
 	}
 
-	Database, err = mysql_db2.ConnectToDatabase("crud_db")
+	Database, err = mysql_db.ConnectToDatabase("crud_db")
 	if err != nil {
 		fmt.Println("Error connecting to database:", err)
 		return
 	}
-	err = Database.AutoMigrate(&mysql_db2.CrudList{})
+	err = Database.AutoMigrate(&mysql_db.CrudList{})
 	if err != nil {
 		fmt.Println("Error init database:", err)
 		return

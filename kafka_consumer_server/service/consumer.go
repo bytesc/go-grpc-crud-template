@@ -4,7 +4,6 @@ import (
 	"container/heap"
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"time"
 )
@@ -37,7 +36,7 @@ func MsgConsumer() {
 		heap.Push(&TaskHeap, task)
 
 		// 打印时间戳
-		fmt.Printf("Message timestamp: %d\n", m.Timestamp)
+		log.Printf("Message timestamp: %d\n", m.Timestamp)
 	}
 }
 
@@ -47,15 +46,21 @@ func TaskWorker() {
 		for TaskHeap.Len() > 0 {
 			task := heap.Pop(&TaskHeap).(*DelayedTask)
 
-			// 等待直到任务的时间戳到达
-			now := time.Now().Unix()
-			if now < task.Timestamp {
-				time.Sleep(time.Unix(task.Timestamp, 0).Sub(time.Now()))
+			if time.Now().UnixNano() < task.Timestamp {
+				heap.Push(&TaskHeap, task)
+				continue
 			}
 
 			// 执行清除缓存操作
-			ClearNameRedisCache(task.Name)
-			fmt.Printf("Cleared cache for %s at timestamp: %d\n", task.Name, task.Timestamp)
+			ok := ClearNameRedisCache(task.Name)
+			if !ok {
+				// 删除失败，延迟一秒重新推入队列
+				task.Timestamp = time.Now().Add(1 * time.Second).UnixNano()
+				heap.Push(&TaskHeap, task)
+				log.Printf("Failed to clear cache for %s, retrying in 1 second\n", task.Name)
+				continue
+			}
+			log.Printf("Cleared cache for %s at timestamp: %d\n", task.Name, task.Timestamp)
 		}
 	}
 }
