@@ -10,4 +10,4 @@ user_cache_kafka:
   topic: "user_cache"
   broker:
     - "127.0.0.1:9092"
-
+  group_id: "my_group"

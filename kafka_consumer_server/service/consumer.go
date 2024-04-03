@@ -39,8 +39,13 @@ func MsgConsumer() {
 		}
 		heap.Push(&TaskHeap, task)
 		MsgSignal <- 1
+
+		if err := KfReader.CommitMessages(ctx, msg); err != nil {
+			log.Printf("error while committing message offset: %s\n", err)
+			continue
+		}
 		// 打印时间戳
-		//log.Printf("Message timestamp: %d\n", m.Timestamp)
+		log.Printf("Message timestamp: %d\n", m.Timestamp)
 	}
 }
 
