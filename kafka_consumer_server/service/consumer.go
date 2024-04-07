@@ -67,6 +67,8 @@ func task() {
 
 		if time.Now().UnixNano() < task.Timestamp {
 			heap.Push(&TaskHeap, task)
+			MsgSignal <- 1
+			log.Println("not to time")
 			continue
 		}
 
