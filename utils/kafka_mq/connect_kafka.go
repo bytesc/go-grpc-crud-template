@@ -10,6 +10,7 @@ func NewKafkaConsumer(mqName string) *kafka.Reader {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   viper.GetStringSlice(mqName + ".broker"),
 		Topic:     viper.GetString(mqName + ".topic"),
+		GroupID:   viper.GetString(mqName + ".group_id"),
 		Partition: 0,
 		MinBytes:  10e3, // 10KB
 		MaxBytes:  10e6, // 10MB

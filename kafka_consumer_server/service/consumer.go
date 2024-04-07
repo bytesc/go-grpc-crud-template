@@ -36,14 +36,11 @@ func MsgConsumer() {
 		task := &DelayedTask{
 			Name:      m.Name,
 			Timestamp: m.Timestamp,
+			Msg:       &msg,
 		}
 		heap.Push(&TaskHeap, task)
 		MsgSignal <- 1
 
-		if err := KfReader.CommitMessages(ctx, msg); err != nil {
-			log.Printf("error while committing message offset: %s\n", err)
-			continue
-		}
 		// 打印时间戳
 		log.Printf("Message timestamp: %d\n", m.Timestamp)
 	}
@@ -53,7 +50,7 @@ func TaskWorker() {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 	for {
-		select{
+		select {
 		case <-MsgSignal:
 			task()
 		case <-ticker.C:
@@ -63,8 +60,7 @@ func TaskWorker() {
 	}
 }
 
-
-func task(){
+func task() {
 	// 处理堆中的任务
 	for TaskHeap.Len() > 0 {
 		task := heap.Pop(&TaskHeap).(*DelayedTask)
@@ -83,7 +79,12 @@ func task(){
 			log.Printf("Failed to clear cache for %s, retrying in 1 second\n", task.Name)
 			continue
 		}
+
+		ctx := context.Background()
+		if err := KfReader.CommitMessages(ctx, *task.Msg); err != nil {
+			log.Printf("error while committing message offset: %s\n", err)
+			continue
+		}
 		log.Printf("Cleared cache for %s at timestamp: %d\n", task.Name, task.Timestamp)
 	}
 }
-

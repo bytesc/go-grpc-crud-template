@@ -2,13 +2,15 @@ package service
 
 import (
 	"container/heap"
+	"github.com/segmentio/kafka-go"
 )
 
 // DelayedTask 是一个延时任务结构体
 type DelayedTask struct {
 	Name      string // 任务名称
 	Timestamp int64  // 执行任务的时间戳
-	Index     int    // 在堆中的索引
+	Msg       *kafka.Message
+	Index     int // 在堆中的索引
 }
 
 // DelayedTaskHeap 是一个延时任务堆
