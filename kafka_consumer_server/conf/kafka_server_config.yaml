@@ -1,3 +1,11 @@
+# 用户权限缓存处理的消息队列配置
+user_cache_kafka:
+  topic: "user_cache"
+  broker:
+    - "127.0.0.1:9092"
+  group_id: "my_group"
+
+# 用户权限缓存
 user_redis:
   Addr: "localhost:6379"
   Password: "123456"
@@ -6,8 +14,5 @@ user_redis:
 # ./kafka-topics.sh --list --bootstrap-server localhost:9092
 # ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic user_cache
 # ./kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic my-topic
-user_cache_kafka:
-  topic: "user_cache"
-  broker:
-    - "127.0.0.1:9092"
-  group_id: "my_group"
+
+

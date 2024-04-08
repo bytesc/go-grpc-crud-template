@@ -61,6 +61,7 @@
 - `MySQL 8.0.31`
 - `Redis 7.2.4`
 - `etcd 3.4.31`
+- `kafka 3.7.0`
 
 ### 安装依赖
 （非必要，后续运行时候也会自动安装）
@@ -92,110 +93,90 @@ go get -u google.golang.org/protobuf
 
 go get -u go.etcd.io/etcd/client/v3
 
+go get github.com/segmentio/kafka-go
 ```
 
-### 创建数据库
+### mysql 数据库
 
 登录`mysql`终端，创建数据库：
 ```sql
 create database crud_list default charset utf8mb4;
 ```
+如果需要使用其它数据库，例如 `PostgreSQL, SQLite, SQL Server`。`./mysql_db/connect_db.go` 为数据库配置文件。修改方法，参考 [grom 官方文档 数据库连接](https://gorm.io/zh_CN/docs/connecting_to_the_database.html)
 
-### 连接数据库
+### etcd 注册中心
+
+docker 安装 etcd
+```bash
+docker run -d --name etcd-server --publish 2379:2379 --publish 2380:2380 --env ALLOW_NONE_AUTHENTICATION=yes --env ETCD_ADVERTISE_CLIENT_URLS=http://etcd-server:2379 bitnami/etcd:latest
+```
+### redis 缓存
+
+docker 安装 redis
+```bash
+docker run --name myredis -it -p 6379:6379 -v /data/redis-data  redis --requirepass "123456"
+```
+
+### kafka 消息队列
+
+docker 安装 kafka
+```bash
+docker run -itd -p 9092:9092 --name  kafka apache/kafka
+```
+
+### 运行项目程序
+
+以下的几个程序都可以运行多个，都可以运行在不同的服务器上。
+
+#### 项目网关入口 api-gateway
 
 `./conf/config.yaml` 为 `api-gateway` 层配置文件
 
-修改其中
 ```yaml
-user_db:
-  DriverName: mysql
-  Database: crud_list
-  Port: 3306
-  UserName: root
-  Password: 123456
-  Host: 127.0.0.1 #host.docker.internal #
-  Charset: utf8mb4
-```
-
-`./crud_rpc_server\conf\rpc_server_config.yaml` 为 `crud-service` 层配置文件
-
-修改其中
-```yaml
-crud_db:
-  DriverName: mysql
-  Database: crud_list
-  Port: 3306
-  UserName: root
-  Password: 123456
-  Host: 127.0.0.1 #host.docker.internal #
-  Charset: utf8mb4
-```
-
-上述两个数据库可以为两个完全独立的数据库，当然，也可以是同一个。如果需要使用其它数据库，例如 `PostgreSQL, SQLite, SQL Server`。`./mysql_db/connect_db.go` 为数据库配置文件。修改方法，参考 [grom 官方文档 数据库连接](https://gorm.io/zh_CN/docs/connecting_to_the_database.html)
-
-
-### 连接 redis
-
-`./conf/config.yaml` 
-
-修改其中
-```yaml
-user_redis:
-  Addr: "localhost:6379"
-  Password: "123456"
-```
-
-### 连接 etcd
-
-```bash
-etcd
-```
-
-`./conf/config.yaml` 
-
-修改其中  `Endpoint`
-```yaml
-etcd:
-  Endpoint: "127.0.0.1:2379"
-  keys:
-    crud_rpc: crud_rpc
-```
-
-`./crud_rpc_server\conf\rpc_server_config.yaml`
-
-修改其中
-```yaml
-etcd:
-  Endpoint: "127.0.0.1:2379"
-```
-
-这里两个配置必须连接同一个`etcd`集群
-
-
-### 配置端口
-
-`./conf/config.yaml` 
-```yaml
+# 本服务的监听配置
 server:
   Addr: 0.0.0.0
   Port: 8008
+
+# 用户登录权限数据库
+user_db:
+  DriverName: mysql
+  Database: crud-list
+  Port: 3306
+  UserName: root
+  Password: 123456
+  Host: 127.0.0.1 #host.docker.internal #
+  Charset: utf8mb4
+
+# 用户权限缓存
+user_redis:
+  Addr: "localhost:6379"
+  Password: "123456"
+
+# 分布式锁
+lock_redis:
+  Addr: "localhost:6379"
+  Password: "123456"
+
+# 用户权限缓存处理的消息队列
+user_cache_kafka:
+  topic: "user_cache"
+  broker:
+    - "127.0.0.1:9092"
+
+# grpc 微服务的注册中心
+etcd:
+  Endpoints:
+    - "127.0.0.1:2379"
+  keys:
+    crud_rpc: crud_rpc
+
+
+# token 签发配置
+token:
+  shortDuration: 30   # token 有效期（分钟），多久无操作就退出
+  longDuration: 1440  # 长 token，多久必须重新登陆
 ```
-这里 `0.0.0.0` 代表运行来自所有 ip 的访问
- 
-如果需要启动多个微服务，每个微服务以下配置的 `Addr` 要不同
-
-`./crud_rpc_server\conf\rpc_server_config.yaml`
-```yaml
-server:
-  Name: crud_rpc
-  Listen: "0.0.0.0:8080"
-  Addr: "127.0.0.1:8080"
-```
-
-
-### 运行
-
-#### api-gateway
 
 编译（会自动安装依赖）：
 ```bash
@@ -209,7 +190,37 @@ go build main.go
 .\main
 ```
 
-#### crud 微服务
+
+#### grpc 微服务服务端
+
+`./crud_rpc_server\conf\rpc_server_config.yaml` 为 `crud-service` 层配置文件
+
+- 这里 `0.0.0.0` 代表运行来自所有 ip 的访问。
+- `Addr` 为运行 grpc 服务的服务器地址，提供给注册中心。如果需要启动多个微服务，每个微服务以下配置的 `Addr` 要不同
+- 必须和 api-gateway 连接到同一个 etcd 注册中心
+
+```yaml
+# 本服务的监听配置和本服务器的地址
+server:
+  Name: crud_rpc
+  Listen: "0.0.0.0:8080"
+  Addr: "127.0.0.1:8080"
+
+# 用于增删改查的数据库
+crud_db:
+  DriverName: mysql
+  Database: crud-list
+  Port: 3306
+  UserName: root
+  Password: 123456
+  Host: 127.0.0.1 #host.docker.internal #
+  Charset: utf8mb4
+
+# 服务注册中心配置
+etcd:
+  Endpoints:
+    - "127.0.0.1:2379"
+```
 
 编译（会自动安装依赖）：
 ```bash
@@ -220,6 +231,34 @@ go build rpc_server.go
 运行：
 ```bash
 .\rpc_server
+```
+
+#### kafka 消息队列 consumer
+
+`./kafka_consumer_server/conf/kafka_server_config.yaml`为其配置文件
+
+```yaml
+# 用户权限缓存处理的消息队列配置
+user_cache_kafka:
+  topic: "user_cache"
+  broker:
+    - "127.0.0.1:9092"
+  group_id: "my_group"
+
+# 用户权限缓存
+user_redis:
+  Addr: "localhost:6379"
+  Password: "123456"
+```
+
+编译：
+```bash
+cd ./kafka_consumer_server
+go build kf_server.go
+```
+运行：
+```bash
+.\kf_server
 ```
 
 #### 测试

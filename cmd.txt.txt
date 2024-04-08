@@ -1,7 +1,6 @@
 cmd.txt
 
-go get google.golang.org/grpc
-go get -u google.golang.org/protobuf
+
 
 protoc --go_out=. --go-grpc_out=. --proto_path=. *proto
 
@@ -13,11 +12,3 @@ import(
 etcdctl get --prefix ""
 
 
-go get -u github.com/go-redis/redis/v8
-
-go get github.com/go-redsync/redsync/v4
-go get github.com/go-redsync/redsync/v4/redis/goredis/v8
-
-
-
-github.com/segmentio/kafka-go

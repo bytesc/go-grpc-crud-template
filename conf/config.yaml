@@ -1,7 +1,9 @@
+# 本服务的监听配置
 server:
   Addr: 0.0.0.0
   Port: 8008
 
+# 用户登录权限数据库
 user_db:
   DriverName: mysql
   Database: crud-list
@@ -11,26 +13,32 @@ user_db:
   Host: 127.0.0.1 #host.docker.internal #
   Charset: utf8mb4
 
+# 用户权限缓存
 user_redis:
   Addr: "localhost:6379"
   Password: "123456"
 
+# 分布式锁
 lock_redis:
   Addr: "localhost:6379"
   Password: "123456"
 
+# 用户权限缓存处理的消息队列
 user_cache_kafka:
   topic: "user_cache"
   broker:
     - "127.0.0.1:9092"
+
+# grpc 微服务的注册中心
+etcd:
+  Endpoints:
+    - "127.0.0.1:2379"
+  keys:
+    crud_rpc: crud_rpc
+
 
 # token 签发配置
 token:
   shortDuration: 30   # token 有效期（分钟），多久无操作就退出
   longDuration: 1440  # 长 token，多久必须重新登陆
 
-etcd:
-  Endpoints:
-    - "127.0.0.1:2379"
-  keys:
-    crud_rpc: crud_rpc

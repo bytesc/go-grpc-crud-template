@@ -1,8 +1,10 @@
+# 本服务的监听配置和本服务器的地址
 server:
   Name: crud_rpc
   Listen: "0.0.0.0:8080"
   Addr: "127.0.0.1:8080"
 
+# 用于增删改查的数据库
 crud_db:
   DriverName: mysql
   Database: crud-list
@@ -12,6 +14,7 @@ crud_db:
   Host: 127.0.0.1 #host.docker.internal #
   Charset: utf8mb4
 
+# 服务注册中心配置
 etcd:
   Endpoints:
     - "127.0.0.1:2379"
