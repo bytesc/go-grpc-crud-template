@@ -11,6 +11,20 @@
 
 🔔 如有项目相关问题，欢迎在本项目提出`issue`，我一般会在 24 小时内回复。
 
+## 系统架构
+
+架构
+
+![](./docs/readme_img/sys.png)
+
+缓存弱一致性
+
+![](./docs/readme_img/sys2.png)
+
+缓存强一致性
+
+![](./docs/readme_img/sys3.png)
+
 ## 效果展示
 
 ### 文件流
